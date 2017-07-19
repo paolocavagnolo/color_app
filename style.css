@@ -1,0 +1,17 @@
+.active {
+  stroke: rgb(10, 10, 10);
+  stroke-width: 0px;
+}
+
+svg {
+  box-sizing: border-box;
+  border: 0px solid rgb(212, 212, 212);
+  margin: 10px;
+}
+
+line {
+  stroke: rgb(212, 212, 212);
+  stroke-width: 1px;
+  shape-rendering: crispEdges;
+}
+

@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+
+<meta charset="utf-8">
+
+<html>
+
+	<head>
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
+		<script src="d3.min.js"></script>
+		<link rel="stylesheet" href="style.css">
+	</head>
+
+	<body id="body">
+
+		<script src="script.js"></script>
+		
+
+		<div class="row">
+			<button class="btn btn-success" id="save_as_svg" value="">
+				Save as SVG</button>
+			<button class="btn btn-success" id="save_as_pdf" value="">
+				Save as PDF</button>
+			<button class="btn btn-success" id="save_as_png" value="">
+				Save as High-Res PNG</button>
+		</div>
+
+			<form id="svgform" method="post" action="download.pl">
+			 <input type="hidden" id="output_format" name="output_format" value="">
+			 <input type="hidden" id="data" name="data" value="">
+			</form>
+
+	</body>
+
+
+	
+
+</html>
