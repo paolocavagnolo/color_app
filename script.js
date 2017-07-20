@@ -2,13 +2,8 @@
 var unity = 50,
     border = 10;
 
-// test
-$.getJSON('http://time.jsontest.com', function(data) {  
-        console.log(data);
-    });
-
 // Define the input file
-var input_file = '[{"color_id":"#99ccff", "size_n":"4"}, {"color_id":"#ff0066", "size_n":"3"},{"color_id":"#66ff66", "size_n":"5"}, {"color_id":"#aa0066", "size_n":"6"}, {"color_id":"#e24366", "size_n":"2"}]',
+var input_file = '[{"color_id":"#FF0000", "size_n":"5"}, {"color_id":"#00FF00", "size_n":"5"},{"color_id":"#0000FF", "size_n":"3"}, {"color_id":"#FF00FF", "size_n":"7"}, {"color_id":"#00FFFF", "size_n":"5"}, {"color_id":"#FFFF00", "size_n":"6"}]',
     palette = JSON.parse(input_file);
 
 var colors = new Array(palette.length),
