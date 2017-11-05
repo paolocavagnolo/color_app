@@ -1,0 +1,27 @@
+.shadow {
+  stroke: rgb(198, 198, 198);
+  stroke-width: 1px;
+  fill: rgb(255, 255, 255);
+}
+
+svg {
+  box-sizing: border-box;
+  border: 0px solid rgb(212, 212, 212);
+  margin-left: 0px;
+  padding: 0px;
+}
+
+line {
+  stroke: rgb(212, 212, 212);
+  stroke-width: 1px;
+  shape-rendering: crispEdges;
+}
+
+.linea {
+  stroke: rgb(0, 0, 0);
+  stroke-width: 1px;
+  shape-rendering: crispEdges;
+}
+
+
+

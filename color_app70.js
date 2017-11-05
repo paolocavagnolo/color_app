@@ -1,15 +1,14 @@
-var UNITY = 54,
-	SPACE = 25,
-    WIDTH = 1024,
-    MAX_SIZE = 12,
-    HEIGHT = MAX_SIZE*UNITY + 16,
-    SMALL = UNITY / 4 - 1,
-    boxX = (UNITY + SPACE)*5 - 21,
+var UNITY = 70,
+	SPACE = 11,
+    WIDTH = 13*(75+10)+4,
+    HEIGHT = 9*UNITY+20,
+    SMALL = UNITY / 5 - 1,
+    boxX = (UNITY + SPACE)*5 - 16,
 	boxY = SMALL + 3,
-	DISTANCE = 12,
+	DISTANCE = 12;
 	TXT_DISTANCE = 53;
-
     
+
 var numEl = 0,
 	squareData = [],
 	squares = [],
@@ -24,7 +23,7 @@ var numEl = 0,
 
 var svgContainer = d3.select("#game").append("svg")
 									.attr("width",WIDTH)
-									.attr("height",HEIGHT);
+									.attr("height",HEIGHT); 
 
 	svgContainer.append("text")
         .attr("x", 0)
@@ -42,10 +41,10 @@ var svgContainer = d3.select("#game").append("svg")
     svgContainer.append("svg:image")
 	   .attr("x",boxX)
 	   .attr("y",boxY)
-	   .attr("width", 75*MAX_SIZE)
-	   .attr("height", 75*MAX_SIZE)
+	   .attr("width", 75*9)
+	   .attr("height", 75*9)
 	   .attr("xlink:href","images/img_bg.jpg")
-	   .attr("id", "bg");
+	   .attr("id", "bg")
 
 function drawShadow(inputN) {
 
@@ -59,9 +58,134 @@ function drawShadow(inputN) {
 
 }
 
+var zTemp = 0;
+var codice = [[]];
 
-function simplyColor(colore) {
-	if (colore == "#FF6804") {
+function new_code() {
+	var min = zero2D(widthBox/UNITY,widthBox/UNITY);
+	codice = zero2D(widthBox/UNITY,widthBox/UNITY);
+
+	for (var i=0; i<(widthBox/UNITY); i++) {
+		for (var j=0; j<(heightBox/UNITY); j++) {
+			for (var w=0; w<squareData.length; w++) {
+				if (squareData[w].x >= boxX) {
+					var xx = (squareData[w].x-boxX)/UNITY;
+					var yy = ((squareData[w].y-boxY)/UNITY);
+					var ss = squareData[w].s/UNITY;
+					if ((i >= xx) && (i < xx + ss)) {
+						if ((j >= yy) && (j < yy + ss)) {
+							if (squareData[w].z < min[i][j]) {
+								min[i][j] = squareData[w].z;
+								//codice[i][j] = squareData[w].c.split("#")[1];
+								codice[i][j] = squareData[w].c;
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+}
+
+function generateCode_1() {
+	var min = zero2D(widthBox/UNITY,widthBox/UNITY);
+	console.log(min);
+
+	var codice = [];
+
+	if (play == 1) {
+		for (var i=0;i<widthBox/UNITY;i++) {
+			for (var j=0;j<widthBox/UNITY;j++) {
+				for (var w=0;w<squareData.length;w++) {
+					if (squareData[w].y >= 2*UNITY) {
+						var xx = squareData[w].x/UNITY;
+						var yy = (squareData[w].y/UNITY - 2);
+						var ss = squareData[w].s/UNITY;
+						if ((i >= xx) && (i < xx + ss)) {
+							if ((j >= yy) && (j < yy + ss)) {
+								if (squareData[w].z < min[i][j]) {
+									min[i][j] = squareData[w].z;
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+
+		console.log(min);
+
+		for (var i=0;i<widthBox/UNITY;i++) {
+			for (var j=0;j<widthBox/UNITY;j++) {
+				if (min[i][j] < 12) {
+					codice.push(min[i][j]);
+				}
+			}
+		}
+
+	}
+
+	console.log(codice);
+
+
+}
+
+function generateCode() {
+	var codiceDef = "";
+
+	if (squareData.length < 10) {
+		codiceDef += 0;
+		codiceDef += squareData.length;
+	}
+	else {
+		codiceDef += squareData.length;
+	}
+
+	for(var i=0; i < squareData.length; i++) {
+        if (squareData[i].y >= 2*UNITY) {
+        	codiceDef += codiceConvert(squareData[i].x/UNITY,(squareData[i].y/UNITY-2),colorNumber(squareData[i].c),squareData[i].s/UNITY,squareData[i].z)
+        }
+    }
+
+    document.getElementById("codice").innerHTML = codiceDef;
+
+    deCode(codiceDef);
+
+}
+
+function codiceConvert(x,y,c,s,z) {
+	var codice = "";
+
+	codice += String.fromCharCode(33+squareData.length*y+x);
+	codice += c;
+	codice += String.fromCharCode(33+squareData.length*s+z);
+
+	return codice;
+
+}
+
+function deCode(cod) {
+	var len = parseInt(cod[0]+cod[1]);
+	console.log(len);
+
+	var x = 0,
+		y = 0,
+		c = "",
+		s = 0,
+		z = 0;
+
+	for (var i=2; i<=cod.length-3; i=i+3) {
+		x = (cod[i].charCodeAt(0)-33)%len;
+		y = Math.floor((cod[i].charCodeAt(0)-33)/len);
+		c = deColor(cod[i+1]);
+		z = (cod[i+2].charCodeAt(0)-33)%len;
+		s = Math.floor((cod[i+2].charCodeAt(0)-33)/len);
+		console.log(x+","+y+","+c+","+s+","+z);
+	}
+}
+
+function colorNumber(colore) {
+	if (colore == "#FF6803") {
 		return 'A';
 	}
 	else if (colore == "#FFFFFF") {
@@ -98,49 +222,49 @@ function simplyColor(colore) {
 
 function deColor(lettera) {
 	if (lettera == "A") {
-		return '#FF6804';
+		return '#FF6803';
 	}
 	else if (lettera == "B") {
-		return '#FFFFFF';
+		return 'FFFFFF';
 	}
 	else if (lettera == "C") {
-		return '#2476FF';
+		return '2476FF';
 	}
 	else if (lettera == "D") {
-		return '#FFDC1E';
+		return 'FFDC1E';
 	}
 	else if (lettera == "E") {
-		return '#B0BBBD';
+		return 'B0BBBD';
 	}
 	else if (lettera == "F") {
-		return '#6C2829';
+		return '6C2829';
 	}
 	else if (lettera == "G") {
-		return '#000000';
+		return '000000';
 	}
 	else if (lettera == "H") {
-		return '#FFB0F7';
+		return 'FFB0F7';
 	}
 	else if (lettera == "I") {
-		return '#FE0000';
+		return 'FE0000';
 	}
 	else if (lettera == "J") {
-		return '#53D000';
+		return '53D000';
 	}
 	else if (lettera == "K") {
-		return '#B74BFF';
+		return 'B74BFF';
 	}
 }
 
 function placeX(n) {
 	if (n<4) {
-		return n*(UNITY+SPACE+10)+1;
+		return n*(UNITY+SPACE)+1;
 	}
 	else if (n<8){
-		return (n-4)*(UNITY+SPACE+10)+1;
+		return (n-4)*(UNITY+SPACE)+1;
 	}
 	else if (n<11){
-		return (n-8)*(UNITY+SPACE+10)+1;
+		return (n-8)*(UNITY+SPACE)+1;
 	}
 
 }
@@ -150,14 +274,49 @@ function placeY(n) {
 		return (SMALL+DISTANCE) + TXT_DISTANCE;
 	}
 	else if (n<8){
-		return 2*(SMALL+DISTANCE) + UNITY + (4*SPACE-6) + TXT_DISTANCE;
+		return 2*(SMALL+DISTANCE) + UNITY + (6*SPACE-6) + TXT_DISTANCE;
 	}
 	else if (n<11){
-		return 3*(SMALL+DISTANCE) + 2*(UNITY + (4*SPACE-6)) + TXT_DISTANCE;
+		return 3*(SMALL+DISTANCE) + 2*(UNITY + (6*SPACE-6)) + TXT_DISTANCE;
 	}
 
 }
 
+function code2color(codeC) {
+	if (codeC == "#FF6803") {
+		return 'ARANCIONE';
+	}
+	else if (codeC == "#FFFFFF") {
+		return 'BIANCO';
+	}
+	else if (codeC == "#2476FF") {
+		return 'BLU';
+	}
+	else if (codeC == "#FFDC1E") {
+		return 'GIALLO';
+	}
+	else if (codeC == "#B0BBBD") {
+		return 'GRIGIO';
+	}
+	else if (codeC == "#6C2829") {
+		return 'MARRONE';
+	}
+	else if (codeC == "#000000") {
+		return 'NERO';
+	}
+	else if (codeC == "#FFB0F7") {
+		return 'ROSA';
+	}
+	else if (codeC == "#FE0000") {
+		return 'ROSSO';
+	}
+	else if (codeC == "#53D000") {
+		return 'VERDE';
+	}
+	else if (codeC == "#B74BFF") {
+		return 'VIOLA';
+	}
+}
 
 function drawSquare(inputData) {
 
@@ -261,13 +420,9 @@ function showFrame() {
 }
 
 var COLORE = "",
-	COLORE_SIZE = 0,
-	ADD_FLAG = false;
-
+	COLORE_SIZE = 0;
 
 function btnAdd() {
-
-	ADD_FLAG = true;
 
 	if (free.length > 0) {
 		var n = free[0];
@@ -341,30 +496,18 @@ function btnReset() {
 	svgContainer.selectAll("g").remove();
 	svgContainer.selectAll(".vertical").remove();
 	svgContainer.selectAll(".horizontal").remove()
-	squareData = [];
-	squares = [];
-	indexes = [];
-	sizes = [];
-	widthBox = 0;
-	heightBox = 0;
+	squareData = [],
+	squares = [],
+	indexes = [],
+	sizes = [],
+	widthBox = 0,
+	heightBox = 0,
 	play = 0;
-	ADD_FLAG = false;
 }
 
 var trovato = false;
 
-
-
-
-
-
-
 function btnPlay() {
-
-	if (!ADD_FLAG) {
-		alert("seleziona almeno un colore");
-		return;
-	} 
 
 	play = 1;
 
@@ -382,8 +525,8 @@ function btnPlay() {
    	heightBox = arrayMax(sizes);
 
 
-   	boxX = boxX + Math.floor((MAX_SIZE - widthBox/UNITY)/2)*UNITY;
-   	boxY = boxY + Math.floor((MAX_SIZE - heightBox/UNITY)/2)*UNITY;
+   	boxX = (UNITY + SPACE)*5 - 16 + Math.floor((9 - widthBox/UNITY)/2)*UNITY;
+   	boxY = boxY = SMALL + 3 + Math.floor((9 - heightBox/UNITY)/2)*UNITY;
 
    	for(var i=0; i < squareData.length; i++) {
         if (squareData[i].s == widthBox && trovato == false) {
@@ -436,6 +579,7 @@ function btnPlay() {
 	else {
 		hideFrame();
 	}
+	new_code();
 }
 
 function removeSquare(id_r) {
@@ -459,42 +603,6 @@ function removeSquare(id_r) {
 		hideFrame();
 	}
 	
-}
-
-function code2color(codeC) {
-	if (codeC == "#FF6804") {
-		return 'ARANCIONE';
-	}
-	else if (codeC == "#FFFFFF") {
-		return 'BIANCO';
-	}
-	else if (codeC == "#2476FF") {
-		return 'BLU';
-	}
-	else if (codeC == "#FFDC1E") {
-		return 'GIALLO';
-	}
-	else if (codeC == "#B0BBBD") {
-		return 'GRIGIO';
-	}
-	else if (codeC == "#6C2829") {
-		return 'MARRONE';
-	}
-	else if (codeC == "#000000") {
-		return 'NERO';
-	}
-	else if (codeC == "#FFB0F7") {
-		return 'ROSA';
-	}
-	else if (codeC == "#FE0000") {
-		return 'ROSSO';
-	}
-	else if (codeC == "#53D000") {
-		return 'VERDE';
-	}
-	else if (codeC == "#B74BFF") {
-		return 'VIOLA';
-	}
 }
 
 function debug() {
@@ -602,6 +710,7 @@ function dragended(d) {
 			svgContainer.selectAll("#lingua_"+d.N).style("fill","#d6d6d6");
 			svgContainer.selectAll("#colore_"+d.N).style("fill","#d6d6d6");
 			svgContainer.selectAll("#size_"+d.N).style("fill","#d6d6d6");
+			new_code();
 		}
 	}
 	
@@ -653,6 +762,12 @@ function arrayMax(arr) {
   return max;
 };
 
+function zero2D(rows, cols) {
+  var array = [], row = [];
+  while (cols--) row.push(12);
+  while (rows--) array.push(row.slice());
+  return array;
+}
 
 function lingua(lin) {
 
@@ -661,16 +776,16 @@ function lingua(lin) {
 
 function colore(coll) {
 	if (coll == "arancione") {
-		COLORE = '#FF6804';
-		COLORE_SIZE = 12;
+		COLORE = '#FF6803';
+		COLORE_SIZE = 9;
 	}
 	else if (coll == "bianco") {
 		COLORE = '#FFFFFF';
-		COLORE_SIZE = 11;
+		COLORE_SIZE = 6;
 	}
 	else if (coll == "blu") {
 		COLORE = '#2476FF';
-		COLORE_SIZE = 10;
+		COLORE_SIZE = 3;
 	}
 	else if (coll == "giallo") {
 		COLORE = '#FFDC1E';
@@ -682,7 +797,7 @@ function colore(coll) {
 	}
 	else if (coll == "marrone") {
 		COLORE = '#6C2829';
-		COLORE_SIZE = 11;
+		COLORE_SIZE = 7;
 	}
 	else if (coll == "nero") {
 		COLORE = '#000000';
@@ -711,7 +826,7 @@ function submit_download_form()
 {
 	var doc = new jsPDF();
 	var border = 20;
-	var UU = (210-2*border)/MAX_SIZE;
+	var UU = (210-2*border)/9;
 	var titleSpace = 80;
 
 	var horizontal = (210 - widthBox/UNITY*UU)/2,
@@ -760,7 +875,6 @@ function submit_download_form()
 
 
 	doc.output('datauri');
-
 }
 
 // function hexToRgb(hex) {
@@ -808,100 +922,3 @@ function textY(n) {
 	}
 
 }
-
-
-function squareData2string() {
-	var theData = [],
-		theString = '';
-
-	var sepCh = ',',
-		endCh = ';';
-
-
-	for (var i=0; i<squareData.length; i++) {
-		if (squareData[i].x >= boxX) {
-			theData.push(squareData[i]);
-		}
-	}
-
-	theData.sort(function (a,b) {
-    	return b.z - a.z;
-    });
-
-	for (var i = 0; i < theData.length; i++) {
-		theString += (theData[i].x-boxX)/UNITY + sepCh + ((theData[i].y-boxY)/UNITY) + sepCh + simplyColor(theData[i].c) + sepCh + theData[i].s/UNITY + sepCh + theData[i].z;
-		theString += endCh;
-	};
-
-	
-	console.log(theString);
-	return theString;
-
-}
-
-function string2squareData( theString ) {
-
-	var newSquareData = [];
-
-	var sepCh = ',',
-		endCh = ';';
-
-	var sq = theString.split(endCh);
-
-
-	for (var i = 0; i < sq.length-1; i++) {
-		var res = sq[i].split(sepCh);
-
-		var newSquare = {
-		      x: res[0],
-		      y: res[1],
-		      c: deColor(res[2]),
-		      s: res[3],
-		      z: res[4]
-		    };
-
-		newSquareData.push(newSquare);
-
-	};
-
-	return newSquareData;
-
-}
-
-function debugg() {
-	
-	create(string2squareData(squareData2string()));
-}
-
-function create( newData ) {
-	var UNITY = 54;
-
-	var svgNew = d3.select("#drawingArea").append("svg")
-									.attr("width",648)
-									.attr("height",648); 
-
-	var squareNew = svgNew.selectAll("rect")
-							.data(newData).enter()
-							.append("rect")
-							.attr("width", function(d) { return d.s*UNITY;})
-							.attr("height", function(d) { return d.s*UNITY;})
-							.attr("x", function(d) { return d.x*UNITY; })
-							.attr("y", function(d) { return d.y*UNITY; })
-							.attr("fill", function(d) { return d.c; }); 	
-
-	print();
-
-}
-
-function print() {
-
-	var tmp = document.getElementById("drawingArea");
-	var svg = tmp.getElementsByTagName("svg")[0];
-	var svg_xml = (new XMLSerializer).serializeToString(svg);
-	canvg(document.getElementById('example'), svg_xml);
-
-}
-
-
-
-
